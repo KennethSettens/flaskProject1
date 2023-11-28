@@ -1,5 +1,4 @@
-from flask import Flask, send_from_directory
-from flask import render_template
+from flask import Flask, send_from_directory, render_template, request, abort
 
 app = Flask(__name__)
 
@@ -11,6 +10,12 @@ def index():
 
 @app.route("/.well-known/apple-developer-merchantid-domain-association.txt")
 def apple_merchant_id_domain_association():
+    # validate apple servers connected here. apple wants this implemented as a strict allow list
+    remote_ip = request.remote_addr # need to be list
+    host = request.headers.get('Host') # needs to be list
+    if remote_ip == "17.171.85.7" and host == "apple-pay-gateway-cert.apple.com ":
+        abort(403)
+
     return send_from_directory("well-known", "apple-developer-merchantid-domain-association.txt")
 
 
